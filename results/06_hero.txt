@@ -1,0 +1,2 @@
+hero: case F138763 (dormant_reactivation), score 0.97, base value -10.31, f(x) 3.46
+LLM to the client: We noticed a recent purchase on your card that looks unusual for your account. We are checking it with you to keep your card safe.

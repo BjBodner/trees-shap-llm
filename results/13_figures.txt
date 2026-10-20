@@ -1,0 +1,7 @@
+top_3           all cases 72% | counterfeit 52% | $0.467 per 1,000
+top_5           all cases 74% | counterfeit 48% | $0.561 per 1,000
+glossary+pct    all cases 70% | counterfeit 26% | $0.666 per 1,000
+top_10+context  all cases 82% | counterfeit 72% | $0.708 per 1,000
+top_all         all cases 88% | counterfeit 86% | $1.148 per 1,000
+flag rate on ordinary denials: raw/names 75%, raw/glossary+pct 68%, eng/names 85%, eng/glossary+pct 51%
+figures saved | API calls this run: 0 | replayed: 7736 | prompt drift: 0

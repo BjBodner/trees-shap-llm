@@ -1,0 +1,8 @@
+143 of 200 cases are alerted by all three models: {'dormant_reactivation': 47, 'card_testing': 47, 'account_takeover': 42, 'counterfeit_card': 7}
+                 n correct        ci95 unclear sure_wrong halluc dir_err value_err usd_per_1k
+anonymized     143      0%    [0%, 0%]    100%         0%     0%      0%        6%      0.374
+names          143     80%  [73%, 86%]      5%        15%     0%      0%        7%      0.515
+glossary+pct   143     83%  [76%, 88%]      0%        17%     0%      0%        3%      0.648
+kitchen_names  143     56%  [48%, 64%]     26%        18%     0%      0%        9%      0.566
+embed_names    143      0%    [0%, 0%]    100%         0%     0%      0%        0%      0.400
+expert + glossary vs kitchen sink: 1.5x more correct rationales

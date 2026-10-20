@@ -1,0 +1,8 @@
+[claims] PR-AUC 0.699 | caught in test: {'staged_accident': 17, 'early_claim': 15, 'inflated_claim': 14}
+[secops] PR-AUC 0.962 | caught in test: {'c2_beaconing': 35, 'data_exfiltration': 24, 'password_spraying': 19}
+                      n correct dir_err value_err
+desk   cond                                      
+claims names         46     98%      0%       17%
+       glossary+pct  46    100%      0%        9%
+secops names         59     93%      0%       13%
+       glossary+pct  59     95%      0%       10%

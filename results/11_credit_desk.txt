@@ -1,0 +1,19 @@
+[credit/raw] ROC-AUC 0.777 | PR-AUC 0.546 | features 23
+[credit/eng] ROC-AUC 0.777 | PR-AUC 0.551 | features 14
+denied by both models: 1084 | sampled 200 | protected attribute in the raw model's top-4 risk drivers: 15 of 200 (8% of all joint denials)
+targeted top-up: 35 more such denials
+                             n precision direction_error hallucinated cites_protected letter_mentions flagged
+cond             decision                                                                                    
+raw/names        deny      200      100%              0%           0%              2%              0%     76%
+raw/glossary+pct deny      200       98%              0%           0%              3%              0%     70%
+eng/names        deny      200       98%              0%           0%              0%              0%     84%
+eng/glossary+pct deny      200       98%              0%           0%              0%              0%     53%
+                 approve    50       98%              0%           0%              0%              0%      2%
+
+raw-model denials with a protected attribute in the top-4 drivers: 50 applicants
+                 cites_protected lists_protected letter_mentions flagged
+cond                                                                    
+eng/glossary+pct              0%              0%              0%     54%
+eng/names                     0%              0%              0%     82%
+raw/glossary+pct             40%             40%              0%     94%
+raw/names                    38%             38%              0%     90%

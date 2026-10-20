@@ -1,0 +1,23 @@
+                            n correct        ci95 unclear sure_wrong halluc dir_err value_err usd_per_1k
+anonymized                200      0%    [0%, 0%]    100%         0%     0%      0%        9%      0.375
+names                     200     68%  [61%, 74%]     17%        15%     0%      0%       12%      0.527
+names+pct                 200     66%  [59%, 72%]     18%        16%     0%      0%        6%      0.536
+glossary+pct              200     70%  [64%, 77%]      6%        24%     0%      0%        6%      0.666
+names+pct|top_10+context  200     83%  [78%, 88%]      3%        14%     0%      0%        6%      0.529
+top_10+context            200     82%  [76%, 87%]      4%        14%     0%      0%        4%      0.708
+names+pct|top_all         200     84%  [78%, 89%]      7%         9%     0%      0%        4%      0.636
+top_all                   200     88%  [83%, 92%]      4%         8%     0%      0%        4%      1.148
+
+hook case F138763: score 0.97, truth dormant_reactivation. claude-haiku-5-5 (2026-10-13) answered dormant_reactivation, because:
+  device_age_days: raises_risk, value vs normal: lower
+  cust_txn_count_30d: raises_risk, value vs normal: lower
+  longest_gap_days_90d: raises_risk, value vs normal: higher
+  new_merchant_for_cust: raises_risk, value vs normal: higher
+analyst_rationale: The card had no transactions in the prior 30 days and a 41.3-day gap before this
+  purchase, so it was dormant before suddenly spending. The purchase came from a brand-new device
+  seen for the first time, which is typical of a compromised or reactivated card. The merchant was
+  also new to this customer. Together these fit dormant_reactivation, which takes precedence over
+  account_takeover when the card was inactive for weeks. Recommend contacting the customer to verify
+  the transaction and reviewing the device and merchant history.
+customer_message: We noticed a recent purchase on your card that looks unusual for your account. We
+  are checking it with you to keep your card safe.

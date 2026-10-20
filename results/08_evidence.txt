@@ -1,0 +1,19 @@
+is_card_present in the top-10 SHAP list: 0 of 50 counterfeit cases
+counterfeit cards named correctly: {'anonymized': '0%', 'names': '24%', 'names+pct': '20%', 'glossary+pct': '26%', 'names+pct|top_10+context': '82%', 'top_10+context': '72%', 'names+pct|top_all': '76%', 'top_all': '86%'}
+
+glossary effect = (names + percentiles + glossary) minus (names + percentiles):
+top 10            66% -> 70% | gain +4.5 pts [+0.0, +9.0] | confidently wrong 16% -> 24%
+top 10 + channel  83% -> 82% | gain -1.0 pts [-5.0, +3.0] | confidently wrong 14% -> 14%
+all 43            84% -> 88% | gain +4.0 pts [+0.5, +7.5] | confidently wrong 9% -> 8%
+
+false account-takeover calls (and how many cite distance_from_home_km):
+                          calls  cite_distance
+cond                                          
+names                         7              3
+names+pct                     6              2
+glossary+pct                 29             22
+names+pct|top_10+context      5              1
+top_10+context               13              4
+names+pct|top_all             5              0
+top_all                       6              0
+glossary row distance_from_home_km catches: counterfeit card; takeovers from far away | rows that mention takeover: 17 of 43

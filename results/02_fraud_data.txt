@@ -1,0 +1,2 @@
+577,955 transactions, 2,732 fraud (0.47%), 800 planted fraud events
+{'embed': 43, 'kitchen': 43, 'expert': 43} | rows per split: {'train': 209791, 'test': 170800, 'warmup': 151414, 'val': 45950}

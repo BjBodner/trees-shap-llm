@@ -1,0 +1,14 @@
+AML accounts: 25,000 | features: 24 | segments: 6 | typologies: 4
+[aml] PR-AUC 0.918 | caught in test: {'dormant_burst': 76, 'mule_pass_through': 69, 'high_risk_corridor': 66, 'structuring': 59}
+                n correct        ci95 unclear sure_wrong halluc dir_err value_err usd_per_1k
+names         200     89%  [84%, 93%]      6%         5%     0%      0%       13%      0.460
+names+pct     200     90%  [86%, 94%]      6%         4%     0%      0%        6%      0.485
+glossary+pct  200     96%  [92%, 98%]      2%         2%     0%      0%       11%      0.539
+truth        high_risk_corridor mule_pass_through structuring dormant_burst
+cond                                                                       
+names                       82%               96%         94%           84%
+names+pct                   86%               98%         94%           84%
+glossary+pct                98%              100%         94%           90%
+glossary+pct minus names+pct: +5.0 pts [+2.0, +8.0]
+glossary+pct minus names: +6.5 pts [+3.0, +10.5]
+LLM calls this session: 0 | replayed: 2486 | prompt drift: 0

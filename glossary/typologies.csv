@@ -1,0 +1,19 @@
+desk|typology|definition
+fraud|card_testing|Small probe charges, often several within minutes at different (often digital) merchants, to check that a stolen card works; sometimes followed by a larger cash-out.
+fraud|account_takeover|Someone else has taken over an ACTIVE customer's online account or card credentials: often a recent change of email, phone or password and a new device, then larger-than-usual online purchases, sometimes at unusual hours. If the card had been inactive for weeks before this, choose dormant_reactivation instead.
+fraud|counterfeit_card|A cloned physical card used in person far from the customer's home, sometimes within hours of a genuine swipe at home (impossible travel).
+fraud|dormant_reactivation|A card that was inactive for weeks suddenly makes purchases, typically online, often from a new device and larger than usual. This takes precedence over account_takeover whenever the card had been inactive for weeks.
+fraud|unclear|The evidence does not clearly fit one typology.
+aml|structuring|Cash deposits split into amounts just under the 10,000 USD reporting threshold, often across several branches, to avoid currency transaction reports.
+aml|mule_pass_through|Money arrives from many new counterparties and leaves again within hours, so almost nothing stays in the account; typical of money-mule accounts.
+aml|high_risk_corridor|Repeated wires, often in round amounts, to jurisdictions with weak anti-money-laundering controls, out of line with the customer's profile.
+aml|dormant_burst|An account that was inactive for most of the year suddenly moves large volumes.
+aml|unclear|The evidence does not clearly fit one typology.
+claims|early_claim|A claim filed very soon after the policy started, as if the loss was planned before buying cover.
+claims|staged_accident|Accident claims whose parties also appear in other claims, with soft-tissue injuries and no police report; typical of organised rings.
+claims|inflated_claim|A genuine loss claimed at a much higher amount than similar claims, often through a repair shop with a history of flagged claims.
+claims|unclear|The evidence does not clearly fit one typology.
+secops|password_spraying|Many failed logins against many different usernames from the same source, trying common passwords.
+secops|data_exfiltration|Unusually large outbound data transfers to a new external destination, often off-hours.
+secops|c2_beaconing|A host calling out to an external server at very regular intervals, as malware does to receive commands.
+secops|unclear|The evidence does not clearly fit one typology.

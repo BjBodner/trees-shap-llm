@@ -1,4 +1,4 @@
-# file: code/08_evidence.py
+# file: code/08_glossary_effect.py
 # Results 2 and 3: what does the narrator need to see, and what does the glossary add?
 cf = [c for c in CASES.values() if c["truth"] == "counterfeit_card"]
 n_cp = sum(any(s["feature"] == "is_card_present" for s in render_case(c, LADDER["names"], None)[1])

@@ -1,6 +1,6 @@
 # file: code/01_setup.py
 # pip install numpy==2.4.6 pandas==3.0.6 scikit-learn==1.9.0 lightgbm==4.7.0 shap==0.53.0 matplotlib==3.11.0 anthropic==1.11.0
-import os, json, hashlib, shutil, textwrap, time, urllib.request, warnings
+import os, sys, json, hashlib, shutil, textwrap, time, urllib.request, warnings
 from pathlib import Path
 
 import numpy as np
@@ -8,7 +8,8 @@ import pandas as pd
 import lightgbm as lgb
 import shap
 import matplotlib
-matplotlib.use("Agg")
+if "ipykernel" not in sys.modules:                # a script: draw off-screen
+    matplotlib.use("Agg")                         # (a notebook also shows each figure)
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.metrics import average_precision_score

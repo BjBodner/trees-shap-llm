@@ -2,13 +2,17 @@
 
 Simulators with planted typologies (card fraud, AML, insurance claims, security
 alerts), the 43-feature fraud builder, the credit loader, and small helpers.
-The article's code blocks import this file; everything that carries the argument
-(models, SHAP, prompts, checks, experiments) is in the article itself.
+The article's code blocks import the names they use from this file (block 1 lists
+them): the simulators and feature builder, the narrator's JSON schema, and small
+stats, formatting and plotting helpers. The models, SHAP, prompts, checks and
+experiments are in the article itself.
 """
 import numpy as np
 import pandas as pd
+import sys
 import matplotlib
-matplotlib.use("Agg")
+if "ipykernel" not in sys.modules:
+    matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 # ---------------------------------------------------------------- card fraud
@@ -615,5 +619,9 @@ def apply_theme(theme=THEME):
     })
 
 def save(fig, path):
-    fig.savefig(path, bbox_inches="tight"); plt.close(fig)
+    """Save to images/; in a notebook, also show the figure inline."""
+    fig.savefig(path, bbox_inches="tight")
+    if "ipykernel" in sys.modules:
+        plt.show()
+    plt.close(fig)
 

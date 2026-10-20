@@ -42,7 +42,17 @@ No numbers change: every LLM answer is replayed from the same cache, with 0 prom
 | 1 | `alert_schema()` and `summarize()` moved to `tsl.py`, and so did two small plot helpers (`bars`, `paired_bars`). Block 1's import line lists every name the article takes from `tsl.py`. | done |
 | 2 | The narrator runs cases one after another: no thread pool, no lock. Replays are instant; live calls are slower but simpler to read. The repo scripts do the same. | done |
 | 3 | The per-typology pivot table is gone from block 5. Block 8 prints the counterfeit accuracy per condition instead, which is the only part the text used. | done |
-| 4 | Article code: 438 → 405 lines. Prose: 3,549 → about 3,000 words. Medium read time: 30 → about 27 min. | done |
+| 4 | Article code: 438 → 405 lines. Prose: 3,549 → about 3,000 words. Medium read time: 30 → about 28 min (27 before the review's teaching additions). | done |
 | 5 | Prose tightened throughout. "What you'll learn" opens "Before we start", and there's a "how to read a waterfall" note after the hero code. The literature table has 4 rows (the other works are cited in one sentence). The scorecard is grouped by topic, with every failure named. | done |
 | 6 | Readability: average sentence 14.1 words, 6.6% over 25 words, no paragraph over 110 words. | done |
-| 7 | Companion repo created (private until Benjy says the article is out): code, `tsl.py`, `run_all.py`, glossaries, cache, results, images, records. The draft and the publish pack stay out of it (TDS first-publication rule). | see below |
+| 7 | Companion repo `BjBodner/trees-shap-llm` created, **private** until Benjy says the article is out (`gh repo edit BjBodner/trees-shap-llm --visibility public`). It holds the code, `tsl.py`, `run_all.py`, glossaries, cache, results, images and the records (57 files at the first commit; secret scan clean). The draft and the publish pack stay out (TDS first-publication rule). Running the article's blocks from a fresh clone matched exactly. | done |
+
+### v5 fixes after independent review v4 (84.8 / 85.3 weighted, READY AFTER BLOCKERS)
+| # | Edit | Factor | Status |
+|---|---|---|---|
+| R1 | Block 4 split into three teaching steps: `04_evidence.py`, `04_llm.py`, `04_verify.py`. The `pct_col` lambda became a short function. Block 8 renamed to `08_glossary_effect.py`. | F4/F8/F10 | done |
+| R2 | Figures show inline in a notebook (the Agg backend is used only outside Jupyter; `save()` shows then closes), and are still saved to `images/`. | F10/F8 | done |
+| R3 | "more decisive, not more correct" → "and only a little more correct". The low-value sentence now gives 4% (trap cases) and 7% (all) against the predicted 30%+. The shorter-list mechanism is hedged, with 19 → 2 false takeover calls on counterfeit cards. | F14 | done |
+| R4 | Teaching terms: AML spelled out; the 4 AML typologies defined; `ci95` and `usd_per_1k` added to the column legend; log-odds and ROC-AUC glossed; two real features named. | F8 | done |
+| R5 | Credit: internal reasons named a protected attribute 38–40% of the time, the letters never did. [17] "aliases and feature descriptions". [15] notes the reversed order. The runtime is in the closing line. | F7/F13/F10 | done |
+| R6 | Pitch note ("17 of 43 rows"), README credit sentence, colour note and checklist pointer; `tsl.py` docstring. | F14/F18 | done |

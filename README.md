@@ -9,7 +9,7 @@ It was tested on five desks: card fraud, AML, insurance claims and SOC alerts (a
 - **Features did most of the explaining.** Hidden names and embeddings gave 0%, the kitchen sink 56%, expert features 80%, and expert features plus glossary 83%, on the 143 alerts all three feature sets caught.
 - **SHAP's top-10 list hid the card-present flag.** Pinning the channel features fixed most of it, without the glossary: names + percentiles went from 66% to 83%.
 - **Holding everything else fixed, the glossary added 4.5 points on fraud** (top 10) **and 5.0 on AML** [+2.0, +8.0]. On fraud it made the narrator more confident, both right and wrong. False account-takeover calls rose from 6 to 29, and 22 of them cited the row that says distance from home catches "takeovers from far away". A pre-registered follow-up found it adds little once the evidence is complete: -1.0 points with the channel pinned, +4.0 with all 43 features.
-- **Credit.** Letters never mentioned protected attributes. The compliance flag over-fired, and the glossary reduced its false alarms on the engineered model from 85% to 51%.
+- **Credit.** Letters never mentioned protected attributes. The compliance flag over-fired, and glossary and percentiles together cut its false alarms on the engineered model from 85% to 51%.
 - **Scorecard.** The original pre-registration: 11 of 24 predictions held. The follow-up: 3 of 6 held.
 
 ## Reproduce
@@ -20,7 +20,7 @@ pip install -r code/requirements.txt
 python run_all.py               # all scripts in one namespace; stdout -> results/<script>.txt
 ```
 - **No API key needed.** Every LLM answer is cached in `llm_cache/responses.jsonl` (5,536 answers), and the narrator replays them. `results/09_aml_desk.txt` and `results/13_figures.txt` print the replay count and the prompt drift (0).
-- **The article's 9 code blocks are `code/01`–`09`, shown in full.** Paste them in order into one notebook, either from this repo's root or with `TSL_HOME` set to a clone. They rebuild every table and figure in the article's main text, the hero image included (`code/06_hero.py`, from the hook case in `code/05_fraud_desk.py`).
+- **The article's 11 code blocks are `code/01`–`09` (block 4 is three files: `04_evidence`, `04_llm`, `04_verify`), shown in full.** Paste them in order into one notebook, either from this repo's root or with `TSL_HOME` set to a clone. They rebuild every table and figure in the article's main text, the hero image included (`code/06_hero.py`, from the hook case in `code/05_fraud_desk.py`).
 - **Repo-only scripts** (`code/10`–`14`) run after them in the same namespace:
   - `10_extras.py`: every other pre-registered fraud condition (abbreviations, the glossary without percentiles, top 3/5/grouped, shuffled SHAP, no SHAP, the repeat), the AML "glossary" rung, the low-value trap (E4) and two more simulated worlds. It uses the full narrator from the article's first version and asserts that it writes the article's prompts byte for byte.
   - `11_credit_desk.py`, `12_more_desks.py`: credit (real UCI data), insurance claims and SOC alerts.
@@ -38,7 +38,7 @@ python run_all.py               # all scripts in one namespace; stdout -> result
 | `glossary/*.csv` | Feature glossaries (pipe-separated) and `typologies.csv` |
 | `llm_cache/responses.jsonl` | Every narrator answer: key, prompt hash, model, date, tokens, JSON |
 | `results/*.txt` | Captured stdout of each script, plus `env.txt` |
-| `images/` | All figures (dark theme, Okabe-Ito colours) |
+| `images/` | All figures (dark theme; Okabe-Ito colours, except shap's own waterfall colours) |
 | `PREREGISTRATION.md` | Predictions, Amendments 1–3, the follow-up (Addendum F) and outcomes. `PREREGISTRATION_v1_original.md` reproduces the hash recorded before any result. |
 | `DECISIONS.md`, `CHANGELOG.md` | Running log: picks, pilots, bugs, deviations, the follow-up; the v4–v5 simplification |
 | `research/literature_notes.md` | 37 sources, each checked on its primary page |
@@ -52,10 +52,10 @@ The article's source bundle (not in this repo) also holds the draft, `REVISION_M
 | PR-AUC 0.872 / 0.763 / 0.732; over 3 worlds 0.897 / 0.762 / 0.731 | `results/03_models.txt`; `results/10_extras.txt`, last 3 lines |
 | Names 68%, names + percentiles 66%, glossary + percentiles 70%; unclear 18% → 6%; confidently wrong 16% → 24%; value errors 12% → 6% | `results/05_fraud_desk.txt`, summary table |
 | Top 10 + channel 82%, all 43 88%; $0.666 / $0.708 / $1.148 per 1,000 | `results/05_fraud_desk.txt`, summary table |
-| Counterfeit cards 26% / 72% / 86%, and 82% with the channel but no glossary | `results/08_evidence.txt`, second line |
+| Counterfeit cards 26% / 72% / 86%, and 82% with the channel but no glossary | `results/08_glossary_effect.txt`, second line |
 | The hook case F138763 and its answer; the hero image | `results/05_fraud_desk.txt`, `results/06_hero.txt` |
 | E1: 143 alerts; 0% / 56% / 0% / 80% / 83%; 1.5x | `results/07_same_alerts.txt` |
-| `is_card_present` in 0 of 50 counterfeit top-10 lists; the glossary effect -1.0 / +4.0 / +4.5; false takeover calls 6 → 29, 22 citing distance; 17 of 43 rows | `results/08_evidence.txt` |
+| `is_card_present` in 0 of 50 counterfeit top-10 lists; the glossary effect -1.0 / +4.0 / +4.5; false takeover calls 6 → 29, 22 citing distance; 17 of 43 rows | `results/08_glossary_effect.txt` |
 | AML 89% / 90% / 96%; +5.0 pts [+2.0, +8.0] like for like, +6.5 pts [+3.0, +10.5] vs plain names; value errors 6% → 11%; corridors 82% → 98% | `results/09_aml_desk.txt` |
 | Abbreviations 78%, 29 of 50 unclear, + glossary 68% and 40 false calls; top 3 72% / 52%; shuffled SHAP 47%, faithful@5 82% → 74%; no SHAP 84%; repeat 94%; trap 4% | `results/10_extras.txt` |
 | Credit ROC-AUC 0.777 / 0.777; 50 protected-driver denials; flags 90% / 94%; false alarms 75% / 68% / 85% / 51% | `results/11_credit_desk.txt`, `results/13_figures.txt` |
@@ -77,4 +77,4 @@ The article's source bundle (not in this repo) also holds the draft, `REVISION_M
 - All other data is simulated by `tsl.py`.
 
 ## Publish checklist
-See `publish/checklist.md`.
+In the article's source bundle (`publish/checklist.md`), not in this repo.

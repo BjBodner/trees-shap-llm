@@ -200,6 +200,6 @@ Glossary effect = glossary+pct minus names+pct, on the same 200 fraud cases:
 
 ## 2026-10-20: Benjy's answers on v4
 - **Hero placement** right after the hook case: "that's fine".
-- **Length:** "let's see how we condense and simplify everything, we want it to be for education purposes". This led to v5 (CHANGELOG): the reviewer's three cuts plus a prose pass, from 30 to about 27 min. The narrator's system prompt and the evidence tables stay word for word, because the cache depends on them.
+- **Length:** "let's see how we condense and simplify everything, we want it to be for education purposes". This led to v5 (CHANGELOG): the reviewer's three cuts plus a prose pass, from 30 to about 28 min. The narrator's system prompt and the evidence tables stay word for word, because the cache depends on them.
 - **Edit pass:** Benjy will do it tomorrow (2026-10-21).
 - **Repo:** "please open a new repo for this project". Created as `BjBodner/trees-shap-llm`, **private** per the publisher rule (private until the article is out). It goes public with `gh repo edit BjBodner/trees-shap-llm --visibility public` when Benjy says so; the article's `asset()` downloads need it public. MIT licence (the publisher default). No gists, no Colab, no Medium draft.

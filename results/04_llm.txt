@@ -1,1 +1,1 @@
-narrator ready | cached answers: 5536 | live API: False
+narrator ready | cached answers: 14592 | live API: False

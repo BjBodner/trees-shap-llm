@@ -11,4 +11,4 @@ names+pct                   86%               98%         94%           84%
 glossary+pct                98%              100%         94%           90%
 glossary+pct minus names+pct: +5.0 pts [+2.0, +8.0]
 glossary+pct minus names: +6.5 pts [+3.0, +10.5]
-LLM calls this session: 0 | replayed: 2486 | prompt drift: 0
+LLM calls this session: 0 | replayed: 7060 | prompt drift: 0

@@ -12,7 +12,7 @@ if "ipykernel" not in sys.modules:                # a script: draw off-screen
     matplotlib.use("Agg")                         # (a notebook also shows each figure)
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
-from sklearn.metrics import average_precision_score
+from sklearn.metrics import average_precision_score, roc_auc_score
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -44,7 +44,8 @@ from tsl import (simulate_fraud, build_features, DAY, TYPOLOGIES,      # fraud d
                  simulate_aml, AML_SEGMENTS, AML_TYPOLOGIES,           # AML desk
                  alert_schema, percentiles, vcat, fmt, ordinal,        # narrator helpers
                  boot_ci, summarize, load_env,                         # stats, reporting
-                 apply_theme, bars, paired_bars, save, OKABE_ITO, GREY)  # plots
+                 apply_theme, bars, paired_bars, save, OKABE_ITO, GREY,  # plots
+                 Context, features_v6, plot_what_it_sees, plot_better_model)   # blocks 9-10
 apply_theme("dark")                               # white on #121212, Okabe-Ito colours
 warnings.filterwarnings("ignore", category=UserWarning)   # shap's output-format notice
 print("seeds:", SEEDS, "| narrator:", MODEL)

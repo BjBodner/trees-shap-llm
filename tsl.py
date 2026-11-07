@@ -24,9 +24,9 @@ TYPOLOGIES = ["card_testing", "account_takeover", "counterfeit_card",
               "dormant_reactivation"]
 DAY = 1440.0                                   # minutes
 
-def _rows(t, amt, online, mcc, merch, xy, label="legit"):
+def _rows(t, amt, online, mcc, merch, xy, label="legit", habit="none"):
     return pd.DataFrame(dict(t=t, amount=np.round(amt, 2), online=online, mcc=mcc,
-                             merchant=merch, x=xy[:, 0], y=xy[:, 1], label=label))
+                             merchant=merch, x=xy[:, 0], y=xy[:, 1], label=label, habit=habit))
 
 def simulate_fraud(seed, n_cust=5000, days=120):
     r = np.random.default_rng(seed)
@@ -66,39 +66,43 @@ def simulate_fraud(seed, n_cust=5000, days=120):
         vpn = online & (r.random(n) < 0.2)                 # IP far from home
         xy[vpn] = r.uniform(0, 2000, (vpn.sum(), 2))
         f = [_rows(t, amt, online, mcc, merch, xy)]
+        f[0].loc[vpn, "habit"] = "vpn"                      # the honest habit behind each purchase (for the false-alarm table)
         for _ in range(r.poisson(1.5)):                     # legit trips, often by air
             s, d = r.uniform(0, days) * DAY, r.uniform(2, 7) * DAY
             ang, km = r.uniform(0, 2 * np.pi), r.uniform(100, 1500)
             dest = home[c] + km * np.array([np.cos(ang), np.sin(ang)])
             on_trip = (f[0].t >= s) & (f[0].t < s + d) & ~f[0].online
             f[0].loc[on_trip, ["x", "y"]] = dest + r.normal(0, 10, (on_trip.sum(), 2))
+            f[0].loc[on_trip, "habit"] = "trip"
             if r.random() < 0.5:                            # big trip purchases
                 k = r.integers(1, 4)
                 f.append(_rows(s + r.uniform(0, d, k), np.exp(mu[c] + r.uniform(1, 2.5, k)),
                                np.zeros(k, bool), r.choice([3, 6, 7, 8], k),
-                               r.integers(0, 1000, k) + 3000, dest + r.normal(0, 10, (k, 2))))
+                               r.integers(0, 1000, k) + 3000, dest + r.normal(0, 10, (k, 2)), habit="trip"))
         for _ in range(r.poisson(0.5)):                     # legit shopping sprees
             k, s = r.integers(3, 7), r.uniform(0, days) * DAY
             f.append(_rows(s + np.cumsum(r.uniform(3, 20, k)),
                            np.exp(mu[c] + r.uniform(0, 1.5, k)), np.zeros(k, bool),
                            r.choice([1, 3, 6], k), r.integers(0, 1000, k) + 3000,
-                           home[c] + r.normal(0, 3, (k, 2))))
+                           home[c] + r.normal(0, 3, (k, 2)), habit="spree"))
         if gamer[c]:                                        # tiny digital bursts
             for _ in range(r.poisson(3)):
                 k, s = r.integers(2, 7), r.uniform(0, days) * DAY
                 f.append(_rows(s + np.cumsum(r.uniform(1, 10, k)), r.uniform(0.99, 4.99, k),
                                np.ones(k, bool), np.full(k, 5),
-                               r.integers(0, 1000, k) + 5000, np.tile(ip, (k, 1))))
+                               r.integers(0, 1000, k) + 5000, np.tile(ip, (k, 1)), habit="app_store"))
         if r.random() < 0.3:                                # small subscriptions
             m = r.integers(0, 1000)
             k = days // 30
             f.append(_rows(np.arange(k) * 30 * DAY + r.uniform(0, DAY), np.full(k, r.uniform(0.99, 9.99)),
                            np.ones(k, bool), np.full(k, 4), np.full(k, 4000 + m),
-                           np.tile(ip, (k, 1))))
+                           np.tile(ip, (k, 1)), habit="subscription"))
         L = pd.concat(f, ignore_index=True)
         if quiet[c]:                                        # legit dormancy
             g0 = r.uniform(10, 70) * DAY
-            L = L[~((L.t >= g0) & (L.t < g0 + r.uniform(30, 80) * DAY))]
+            gap = r.uniform(30, 80) * DAY
+            L = L[~((L.t >= g0) & (L.t < g0 + gap))].copy()
+            L.loc[(L.t >= g0 + gap) & (L.t < g0 + gap + 7 * DAY) & (L.habit == "none"), "habit"] = "back_from_quiet"
         pc = [r.uniform(0, days) * DAY] if r.random() < 0.15 else []
         new_phone = r.uniform(10, days) * DAY if r.random() < 0.35 else np.inf
         if c in ev_of:
@@ -114,6 +118,7 @@ def simulate_fraud(seed, n_cust=5000, days=120):
             F["device"] = np.where(F.online, 10 * c + (7 if new_dev else 0), -1)
             F["event_id"] = e.event_id
             rows.append(F.assign(cust=c))
+        L = L.assign(habit=np.where((L.habit == "none") & L.online & (L.t > new_phone), "new_phone", L.habit))
         L = L.assign(device=np.where(L.online, 10 * c + (L.t > new_phone), -1),
                      event_id=-1, cust=c)
         rows.append(L)
@@ -625,3 +630,201 @@ def save(fig, path):
         plt.show()
     plt.close(fig)
 
+
+# ------------------------------------------- v6: better context and better features
+# Rarity, fraud rate and past-fraud columns for the narrator (block 9), built from TRAIN rows only.
+class Context:
+    def __init__(self, X, label, bins=20, a_rate=20.0, a_mix=8.0, balanced=False):
+        lab, self.f = np.asarray(label), {}
+        is_fraud = lab != "legit"
+        base = is_fraud.mean()
+        rows = np.array([(lab == t).sum() for t in TYPOLOGIES], float)  # fraud ROWS per pattern
+        prior = np.full(4, 0.25) if balanced else rows / rows.sum()
+        for c in X.columns:
+            col = X[c].to_numpy(float)
+            ok = ~np.isnan(col)
+            vals = np.unique(col[ok])
+            exact = len(vals) <= 8                                      # few values: one bin each
+            edges = None if exact else np.unique(np.quantile(col[ok], np.linspace(0, 1, bins + 1)))[1:-1]
+            b = np.full(len(col), -1)
+            b[ok] = np.searchsorted(vals, col[ok]) if exact else np.searchsorted(edges, col[ok], "right")
+            nb = len(vals) if exact else len(edges) + 1
+            n = np.bincount(b[b >= 0], minlength=nb).astype(float)
+            nf = np.bincount(b[(b >= 0) & is_fraud], minlength=nb).astype(float)
+            by_type = np.stack([np.bincount(b[(b >= 0) & (lab == t)], minlength=nb)
+                                for t in TYPOLOGIES], 1).astype(float)
+            if balanced:           # card-testing events have 3-8 rows, the others 1-3: weigh patterns equally
+                by_type = by_type / rows * rows.mean()
+            self.f[c] = dict(normal=np.sort(col[ok & ~is_fraud]), vals=vals, edges=edges, exact=exact, nb=nb,
+                             rate=(nf + a_rate * base) / (n + a_rate) / base,
+                             mix=(by_type + a_mix * prior) / (by_type.sum(1, keepdims=True) + a_mix))
+
+    def bin(self, c, v):
+        s = self.f[c]
+        return (int(np.clip(np.searchsorted(s["vals"], v), 0, s["nb"] - 1)) if s["exact"]
+                else int(np.searchsorted(s["edges"], v, "right")))
+
+    def rarity(self, c, v):
+        """('common' | 'high' | 'low', share of normal transactions); a value shared by 5%+ is 'common'."""
+        if pd.isna(v):
+            return None, np.nan
+        a = self.f[c]["normal"]
+        same = (np.searchsorted(a, v, "right") - np.searchsorted(a, v, "left")) / len(a)
+        if same >= 0.05:
+            return "common", same
+        at_least, at_most = 1 - np.searchsorted(a, v, "left") / len(a), np.searchsorted(a, v, "right") / len(a)
+        return ("high", at_least) if at_least < at_most else ("low", at_most)
+
+    def vs_normal(self, c, v):                                         # the ground truth we grade claims against
+        kind, share = self.rarity(c, v)
+        return None if kind is None else "typical" if kind == "common" or share >= 0.25 else (
+            "higher" if kind == "high" else "lower")
+
+    def rate(self, c, v):
+        return float(self.f[c]["rate"][self.bin(c, v)]) if pd.notna(v) else np.nan
+
+    def mix(self, c, v):
+        return self.f[c]["mix"][self.bin(c, v)] if pd.notna(v) else None
+
+    def render(self, case, cond, gl):
+        """Like render_case, but the percentile column becomes rarity (+ fraud rate, + past fraud)."""
+        order = case["shap"].abs().sort_values(ascending=False).index
+        keep = list(order[:10]) + [f for f in cond.get("pin", []) if f not in list(order[:10])]
+        heads = ["feature", "value", "SHAP", "vs normal"] + (["fraud rate"] if cond.get("rate") else []) \
+                + (["past fraud"] if cond.get("mix") else [])
+        shown, lines = [], []
+        for f in keep:
+            v = case["values"][f]
+            cells = [f, fmt(v), f"{case['shap'][f]:+.2f}", rarity_text(*self.rarity(f, v))]
+            if cond.get("rate"):
+                r = self.rate(f, v)
+                cells.append("n/a" if pd.isna(r) else f"{r:.1f}x" if r < 10 else f"{r:.0f}x")
+            if cond.get("mix"):
+                cells.append(mix_text((getattr(self, "eq", None) if cond.get("equal") else self).mix(f, v)) or "no clear pattern")
+            lines.append(" | ".join(cells))
+            shown.append(dict(feature=f, name=f, shap=case["shap"][f], value=v, vcat=self.vs_normal(f, v)))
+        msg = (f"Case {case['case_id']}\n{case['score_line']}\n\nFeatures (largest |SHAP| first):\n"
+               + " | ".join(heads) + "\n" + "\n".join(lines))
+        if cond.get("rate") or cond.get("mix"):
+            msg += LEGEND
+        if cond.get("gloss"):
+            msg += "\n\nGlossary for these features:\n" + "\n".join(
+                f"- {s['name']}: {g.what}. Catches: {g.catches}. Why: {g.motivation}. If higher than expected: "
+                f"{g.if_higher}. If lower: {g.if_lower}. Typical: {g.typical}."
+                for s in shown for g in [gl.loc[s["feature"]]])
+        return msg, shown
+
+def share_text(p):
+    return f"{p * 100:.1f}%" if p < 0.10 else f"{p * 100:.0f}%"
+
+def rarity_text(kind, share):
+    if kind is None:
+        return "n/a"
+    if kind == "common":
+        return f"common: {share_text(share)} of normal transactions have exactly this value"
+    return (f"high: only {share_text(share)} of normal transactions are this high or higher" if kind == "high"
+            else f"low: only {share_text(share)} of normal transactions are this low or lower")
+
+def mix_text(m):
+    if m is None:
+        return "n/a"
+    top = np.argsort(-m)[:2]
+    return ", ".join(f"{TYPOLOGIES[i]} {m[i] * 100:.0f}%" for i in top if m[i] >= 0.2)
+
+
+# 19 extra fraud features, one per tell the first 43 missed (block 10). Past and present only.
+def features_v6(tx, cust, X0, XK):
+    t, c, amt, mcc = tx.t.to_numpy(), tx.cust.to_numpy(), tx.amount.to_numpy(), tx.mcc.to_numpy()
+    x, y_, online = tx.x.to_numpy(), tx.y.to_numpy(), tx.online.to_numpy().astype(bool)
+    n, idx, DAYS = len(tx), np.arange(len(tx)), 1440.0
+    key = c * 1e7 + t                                   # rows are sorted by (customer, time)
+    inside = lambda w: np.searchsorted(key, key - w, "right")     # window (t-w, t]
+    before = lambda w: np.searchsorted(key, key - w, "left")      # window [t-w, t)
+    cs = lambda a: np.r_[0, np.cumsum(a)]
+    last = lambda a, w: cs(a)[idx + 1] - cs(a)[inside(w)]         # sum over the last w minutes
+    prior = lambda a, w: cs(a)[idx] - cs(a)[before(w)]            # same, excluding this row
+    ratio = lambda a, b: np.where(b > 0, a / np.where(b > 0, b, 1), np.nan)
+    d_home, median = X0.distance_from_home_km.to_numpy(), X0.cust_median_amount_90d.to_numpy()
+    new_shop = X0.new_merchant_for_cust.to_numpy().astype(float)
+    F = {}
+    # card testing: tiny probes first, the cash-out hours later (so look back 6 hours, not 1)
+    F["n_tiny_online_6h"] = last(((amt < 5) & online).astype(float), 360)
+    for name, w in [("1h", 60), ("6h", 360), ("24h", DAYS)]:
+        F[f"n_new_merchants_{name}"] = last(new_shop, w)
+    F["n_online_txn_1h"] = last(online.astype(float), 60)
+    # account takeover: bigger than this customer's habit, odd hours, a different network
+    n90, log_amt = prior(np.ones(n), 90 * DAYS), np.log(np.maximum(amt, 0.01))
+    m1, m2 = ratio(prior(log_amt, 90 * DAYS), n90), ratio(prior(log_amt ** 2, 90 * DAYS), n90)
+    F["amount_zscore_for_cust"] = np.where(n90 >= 5, (log_amt - m1) / np.sqrt(np.maximum(m2 - m1 ** 2, 0) + 0.25), np.nan)
+    angle = 2 * np.pi * (t % DAYS) / DAYS                          # time of day as a point on a circle
+    usual = np.arctan2(prior(np.sin(angle), 90 * DAYS), prior(np.cos(angle), 90 * DAYS))
+    off = np.abs((angle - usual + np.pi) % (2 * np.pi) - np.pi) * 24 / (2 * np.pi)
+    F["hour_deviation_hours"] = np.where(n90 >= 5, off, np.nan)
+    n_on = prior(online.astype(float), 90 * DAYS)
+    mx, my = ratio(prior(x * online, 90 * DAYS), n_on), ratio(prior(y_ * online, 90 * DAYS), n_on)
+    F["online_ip_shift_km"] = np.where(online & (n_on >= 3), np.hypot(x - mx, y_ - my), np.nan)
+    prev_online = pd.Series(np.r_[-1, np.where(online, idx, -1)[:-1]]).groupby(c).cummax().to_numpy()
+    p = np.where(prev_online >= 0, prev_online, 0)
+    F["distance_from_last_online_km"] = np.where((prev_online >= 0) & online, np.hypot(x - x[p], y_ - y_[p]), np.nan)
+    F["cust_vpn_share_90d"] = np.where(n_on >= 3, ratio(prior((online & (d_home > 200)).astype(float), 90 * DAYS), n_on), np.nan)
+    F["spend_1h_vs_cust_median"] = ratio(last(amt, 60), median)
+    F["max_amount_24h_vs_cust_median"] = ratio(XK.amount_max_24h.to_numpy(), median)
+    # dormant reactivation: how many purchases this customer should have made during the silence
+    F["expected_txns_missed"] = X0.minutes_since_last_txn.to_numpy() / DAYS * n90 / 90
+    # counterfeit card: a short burst in a shop, far from home, versus a long legitimate trip
+    far = ((~online) & (d_home > 200)).astype(float)
+    F["n_far_card_present_24h"], F["n_far_card_present_7d"] = last(far, DAYS), last(far, 7 * DAYS)
+    by_cat = np.argsort((c * 10 + mcc) * 1e7 + t, kind="stable")   # same shop category, same customer
+    k2, a2 = ((c * 10 + mcc) * 1e7 + t)[by_cat], amt[by_cat]
+    start = np.searchsorted(k2, k2 - 90 * DAYS, "left")
+    cnt, tot = np.arange(n) - start, np.r_[0, np.cumsum(a2)][np.arange(n)] - np.r_[0, np.cumsum(a2)][start]
+    rel = np.where(cnt >= 3, a2 / np.where(cnt > 0, tot / np.maximum(cnt, 1), 1), np.nan)
+    F["amount_vs_cust_mcc_mean"] = np.empty(n); F["amount_vs_cust_mcc_mean"][by_cat] = rel
+    F["n_far_card_present_6h"] = last(far, 360)
+    F["first_far_card_present_7d"] = ((far == 1) & (prior(far, 7 * DAYS) == 0)).astype(int)
+    prev_far = pd.Series(np.r_[-1, np.where(far == 1, idx, -1)[:-1]]).groupby(c).cummax().to_numpy()
+    p = np.where(prev_far >= 0, prev_far, 0)
+    F["minutes_since_last_far_card_present"] = np.where((prev_far >= 0) & (c[p] == c), t - t[p], np.nan)
+    return pd.DataFrame(F)
+
+LEGEND = ("\n\nColumns: 'vs normal' says how common the value is among normal transactions; 'fraud rate' is how many "
+          "times the average fraud rate transactions with such a value have; 'past fraud' lists the fraud patterns "
+          "of known past fraud with such values (from training data).")
+
+
+def plot_what_it_sees(ALL, n_cases, path="images/03_what_it_sees.png"):
+    """Figure 3: how often the narrator names the real pattern, by what it is shown."""
+    from matplotlib.patches import Patch
+    order = [("names", "Names\nonly"), ("names+pct", "+ percentile"), ("A1 names+tail", "+ rarity\ninstead"),
+             ("glossary+pct", "+ glossary"), ("names+pct|top_10+context", "Pin card /\nonline flags"),
+             ("A5 names+tail+lift|chan", "Pinned +\nrarity + rate")]
+    acc = np.array([ALL[ALL.cond == c].correct.mean() for c, _ in order])
+    ci = np.array([boot_ci(ALL[ALL.cond == c].correct) for c, _ in order])
+    fig, ax = plt.subplots(figsize=(10, 6))
+    bars(ax, [l for _, l in order], acc, ci=ci, ylim=1.12, ylabel="Correct fraud pattern", fs=11,
+         colors=[GREY, OKABE_ITO[5], OKABE_ITO[2], GREY, OKABE_ITO[1], OKABE_ITO[1]])
+    ax.set_title(f"Same model, same alerts, {n_cases} cases.\nWhat the narrator sees decides how often it is right", loc="left")
+    ax.legend(handles=[Patch(color=GREY, label="baseline or no effect"), Patch(color=OKABE_ITO[5], label="hurts"),
+                       Patch(color=OKABE_ITO[2], label="fixes the wording"),
+                       Patch(color=OKABE_ITO[1], label="adds the channel fact")],
+              frameon=False, loc="upper left", ncol=4, fontsize=10)
+    save(fig, path)
+
+
+def plot_better_model(EV, ALL, V6, path="images/04_better_model.png"):
+    """Figure 4: fraud events caught, and how often the narrator is right, for the 43- and 62-feature models."""
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(14, 6))
+    pats = ["card_testing", "account_takeover", "counterfeit_card", "dormant_reactivation"]
+    paired_bars(a1, ["Card\ntesting", "Account\ntakeover", "Counterfeit\ncard", "Dormant\ncard"],
+                {"43 features": [EV["v5, 43 features"][p] / 100 for p in pats],
+                 "62 features": [EV["v6, 62 features"][p] / 100 for p in pats]}, [GREY, OKABE_ITO[2]],
+                ylim=1.12, ylabel="% of the 100 test fraud events caught", fs=11)
+    a1.legend(frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.17), ncol=2)
+    a1.set_title("A better model catches more", loc="left")
+    rungs = [("names+pct", "Names +\npercentile"), ("glossary+pct", "+ glossary"),
+             ("names+pct|top_10+context", "Channel\npinned")]
+    paired_bars(a2, [l for _, l in rungs], {"43 features": [ALL[ALL.cond == c].correct.mean() for c, _ in rungs],
+                                            "62 features": [V6[V6.cond == c].correct.mean() for c, _ in rungs]},
+                [GREY, OKABE_ITO[2]], ylim=1.12, ylabel="Correct fraud pattern", fs=11)
+    a2.set_title("...and is easier to explain", loc="left")
+    save(fig, path)

@@ -1,0 +1,11 @@
+                 purchases  false_alarms  per_1000_purchases share_of_false_alarms
+habit                                                                             
+app_store             1654            67               40.51                   15%
+trip                  8297           248               29.89                   54%
+back_from_quiet       1877            24               12.79                    5%
+vpn                   9210            49                5.32                   11%
+new_phone            11314            55                4.86                   12%
+none                132674            17                0.13                    4%
+subscription          1343             0                0.00                    0%
+spree                 3077             0                0.00                    0%
+false alarms in total: 460 among 169,446 honest purchases

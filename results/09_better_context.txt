@@ -1,0 +1,40 @@
+                                  n correct        ci95 unclear sure_wrong halluc dir_err value_err usd_per_1k
+names                           371     68%  [63%, 72%]     17%        16%     0%      0%       12%      0.532
+names+pct                       371     63%  [59%, 68%]     19%        17%     0%      0%        6%      0.534
+glossary+pct                    371     68%  [64%, 73%]      7%        25%     0%      0%        6%      0.672
+names+pct|top_10+context        371     82%  [78%, 86%]      2%        15%     0%      0%        5%      0.533
+top_10+context                  371     81%  [78%, 85%]      4%        15%     0%      0%        4%      0.708
+A1 names+tail                   371     68%  [64%, 73%]     16%        16%     0%      0%        2%      0.520
+A2 names+tail+lift              371     65%  [60%, 70%]     17%        18%     0%      1%        2%      0.579
+A3 names+tail+lift+mix          371     73%  [68%, 77%]      5%        22%     0%      0%        3%      0.596
+A8 names+tail+lift+balmix       371     78%  [74%, 82%]      3%        19%     0%      0%        4%      0.586
+A5 names+tail+lift|chan         371     83%  [79%, 87%]      2%        15%     0%      1%        2%      0.586
+A9 names+tail+lift+balmix|chan  371     85%  [81%, 88%]      1%        14%     0%      0%        3%      0.584
+
+what the narrator sees for the 0.97 case (rarity version, first rows):
+Case F138763
+Model score: 0.970 (alert threshold 0.032). Decision: ALERT
+
+Features (largest |SHAP| first):
+feature | value | SHAP | vs normal
+device_age_days | 0 | +5.14 | low: only 1.3% of normal transactions are this low or lower
+cust_txn_count_30d | 0 | +1.95 | low: only 0.1% of normal transactions are this low or lower
+longest_gap_days_90d | 41.3 | +1.50 | high: only 0.5% of normal transactions are this high or higher
+new_merchant_for_cust | 1 | +0.96 | common: 61% of normal transactions have exactly this value
+
+paired differences (points, 95% interval):
+rarity text instead of percentile   +4.9 [ +1.9,  +8.1]
+rarity text vs names only           +0.5 [ -2.7,  +3.8]
++ fraud rate                        -3.2 [ -6.5,  -0.3]
++ past fraud, counted per row       +7.5 [ +2.7, +12.4]
++ past fraud, kinds equal          +12.9 [ +8.6, +17.3]
+channel pinned, rarity + rate       +0.8 [ -1.6,  +3.2]
++ past fraud, equal, pinned         +1.9 [ -0.3,  +4.3]
+
+correct pattern, by true fraud pattern:
+truth                     counterfeit_card dormant_reactivation account_takeover card_testing
+cond                                                                                         
+A2 names+tail+lift                     20%                 100%              73%          67%
+A3 names+tail+lift+mix                 51%                  98%              47%          95%
+A8 names+tail+lift+balmix              71%                 100%              67%          74%
+LLM calls this session: 0 | replayed: 4510 | prompt drift: 0

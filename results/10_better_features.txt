@@ -1,0 +1,16 @@
+43 features -> 62 features
+by hand, n_tiny_online_6h matches features_v6: True
+v5, 43 features  AUROC 0.9973 | PR-AUC 0.872 | fraud events caught 371 of 400: {'account_takeover': 92, 'card_testing': 95, 'counterfeit_card': 93, 'dormant_reactivation': 91}
+v6, 62 features  AUROC 0.9991 | PR-AUC 0.934 | fraud events caught 390 of 400: {'account_takeover': 93, 'card_testing': 100, 'counterfeit_card': 97, 'dormant_reactivation': 100}
+
+390 caught events explained by the v6 model:
+                            n correct        ci95 unclear sure_wrong halluc dir_err value_err usd_per_1k
+names+pct                 390     80%  [76%, 84%]      6%        14%     0%      0%        4%      0.505
+glossary+pct              390     82%  [78%, 86%]      2%        17%     0%      0%        5%      0.655
+names+pct|top_10+context  390     87%  [84%, 90%]      2%        12%     0%      0%        4%      0.507
+top_10+context            390     86%  [82%, 89%]      2%        13%     0%      0%        5%      0.690
+A5 names+tail+lift|chan   390     88%  [84%, 91%]      1%        12%     0%      0%        6%      0.562
+glossary added (top 10)    +1.5 [-1.3, +4.4]
+pin channel flags          +6.7 [+3.6, +9.7]
+by true pattern: {'account_takeover': '78%', 'card_testing': '77%', 'counterfeit_card': '95%', 'dormant_reactivation': '100%'}
+LLM calls this session: 0 | replayed: 6460 | prompt drift: 0

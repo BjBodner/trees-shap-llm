@@ -1,12 +1,10 @@
+371 caught fraud events: {'card_testing': 95, 'counterfeit_card': 93, 'account_takeover': 92, 'dormant_reactivation': 91}
                             n correct        ci95 unclear sure_wrong halluc dir_err value_err usd_per_1k
-anonymized                200      0%    [0%, 0%]    100%         0%     0%      0%        9%      0.375
-names                     200     68%  [61%, 74%]     17%        15%     0%      0%       12%      0.527
-names+pct                 200     66%  [59%, 72%]     18%        16%     0%      0%        6%      0.536
-glossary+pct              200     70%  [64%, 77%]      6%        24%     0%      0%        6%      0.666
-names+pct|top_10+context  200     83%  [78%, 88%]      3%        14%     0%      0%        6%      0.529
-top_10+context            200     82%  [76%, 87%]      4%        14%     0%      0%        4%      0.708
-names+pct|top_all         200     84%  [78%, 89%]      7%         9%     0%      0%        4%      0.636
-top_all                   200     88%  [83%, 92%]      4%         8%     0%      0%        4%      1.148
+names                     371     68%  [63%, 72%]     17%        16%     0%      0%       12%      0.532
+names+pct                 371     63%  [59%, 68%]     19%        17%     0%      0%        6%      0.534
+glossary+pct              371     68%  [64%, 73%]      7%        25%     0%      0%        6%      0.672
+names+pct|top_10+context  371     82%  [78%, 86%]      2%        15%     0%      0%        5%      0.533
+top_10+context            371     81%  [78%, 85%]      4%        15%     0%      0%        4%      0.708
 
 hook case F138763: score 0.97, truth dormant_reactivation. claude-haiku-5-5 (2026-10-13) answered dormant_reactivation, because:
   device_age_days: raises_risk, value vs normal: lower

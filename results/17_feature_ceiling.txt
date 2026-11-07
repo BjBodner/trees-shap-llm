@@ -1,0 +1,7 @@
+a tree on the 43 inputs alone names the fraud pattern for 97.6% of the 371 caught events
+col_0                 account_takeover  card_testing  counterfeit_card  dormant_reactivation
+row_0                                                                                       
+account_takeover                    86             3                 0                     3
+card_testing                         2            92                 0                     1
+counterfeit_card                     0             0                93                     0
+dormant_reactivation                 0             0                 0                    91

@@ -5,8 +5,8 @@ PARAMS = dict(objective="binary", learning_rate=0.05, num_leaves=31, min_child_s
               n_estimators=3000, verbose=-1, deterministic=True, force_row_wise=True,
               num_threads=4)
 
-def train(X, y, split, seed, alert_rate=0.01):
-    m = lgb.LGBMClassifier(**PARAMS, random_state=seed)
+def train(X, y, split, seed, alert_rate=0.01, params=None):
+    m = lgb.LGBMClassifier(**(params or PARAMS), random_state=seed)
     m.fit(X[split == "train"], y[split == "train"], eval_X=X[split == "val"],
           eval_y=y[split == "val"], eval_metric="average_precision",
           callbacks=[lgb.early_stopping(100, verbose=False)])

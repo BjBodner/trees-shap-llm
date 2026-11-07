@@ -1,6 +1,7 @@
-# file: code/11_credit_desk.py
+# file: code/14_credit_desk.py
 # Repo only. Desk 3: credit, on REAL data: 30,000 Taiwanese card clients (UCI, CC BY 4.0).
 # Decision: approve or deny a credit-limit increase. The riskiest 20% are denied.
+from tsl import *                                  # the repo scripts use the rest of tsl.py
 import re
 from sklearn.metrics import roc_auc_score
 X_raw, y_cr = load_credit()                                   # UCI via OpenML, 23 raw columns

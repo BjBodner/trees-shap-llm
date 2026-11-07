@@ -1,6 +1,4 @@
-# Citations (TDS format)
-
-All 29 sources were checked on their primary pages (authors, title, year, venue); details are in research/literature_notes.md. Every source is cited inline in draft.md. This file mirrors the article's References section.
+# References
 
 [1] S. M. Lundberg and S.-I. Lee, [A Unified Approach to Interpreting Model Predictions](https://proceedings.neurips.cc/paper/2017/hash/8a20a8621978632d76c43dfd28b67767-Abstract.html) (2017), NeurIPS 30
 

@@ -1,19 +1,19 @@
-is_card_present in the top-10 SHAP list: 0 of 50 counterfeit cases
-counterfeit cards named correctly: {'anonymized': '0%', 'names': '24%', 'names+pct': '20%', 'glossary+pct': '26%', 'names+pct|top_10+context': '82%', 'top_10+context': '72%', 'names+pct|top_all': '76%', 'top_all': '86%'}
+is_card_present in the top-10 SHAP list: 0 of 93 counterfeit cases
+counterfeit cards named correctly: {'names': '29%', 'names+pct': '15%', 'glossary+pct': '26%', 'names+pct|top_10+context': '84%', 'top_10+context': '74%'}
 
-glossary effect = (names + percentiles + glossary) minus (names + percentiles):
-top 10            66% -> 70% | gain +4.5 pts [+0.0, +9.0] | confidently wrong 16% -> 24%
-top 10 + channel  83% -> 82% | gain -1.0 pts [-5.0, +3.0] | confidently wrong 14% -> 14%
-all 43            84% -> 88% | gain +4.0 pts [+0.5, +7.5] | confidently wrong 9% -> 8%
+paired differences between evidence formats (points, 95% interval):
+percentiles vs names only         68% -> 63% | -4.3 [-7.5, -1.1] | confidently wrong 16% -> 17%
+glossary added (top 10)           63% -> 68% | +5.1 [+2.2, +8.1] | confidently wrong 17% -> 25%
+glossary vs names only            68% -> 68% | +0.8 [-2.4, +4.0] | confidently wrong 16% -> 25%
+pin channel flags (names+pct)     63% -> 82% | +18.9 [+14.8, +23.2] | confidently wrong 17% -> 15%
+glossary added (channel pinned)   82% -> 81% | -0.8 [-4.0, +2.2] | confidently wrong 15% -> 15%
 
 false account-takeover calls (and how many cite distance_from_home_km):
                           calls  cite_distance
 cond                                          
-names                         7              3
-names+pct                     6              2
-glossary+pct                 29             22
-names+pct|top_10+context      5              1
-top_10+context               13              4
-names+pct|top_all             5              0
-top_all                       6              0
+names                        13              5
+names+pct                    11              4
+glossary+pct                 50             38
+names+pct|top_10+context     11              1
+top_10+context               23              7
 glossary row distance_from_home_km catches: counterfeit card; takeovers from far away | rows that mention takeover: 17 of 43

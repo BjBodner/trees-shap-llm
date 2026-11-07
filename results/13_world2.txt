@@ -1,0 +1,18 @@
+587,124 transactions, 2,655 fraud (0.45%), 800 planted fraud events
+expert   PR-AUC 0.850 | fraud events caught: {'account_takeover': 81, 'card_testing': 96, 'counterfeit_card': 90, 'dormant_reactivation': 96}
+363 caught fraud events: {'card_testing': 96, 'dormant_reactivation': 96, 'counterfeit_card': 90, 'account_takeover': 81}
+                            n correct        ci95 unclear sure_wrong halluc dir_err value_err usd_per_1k
+names+pct                 363     68%  [63%, 72%]     15%        17%     0%      0%        6%      0.528
+glossary+pct              363     71%  [66%, 75%]      4%        25%     0%      0%        5%      0.665
+names+pct|top_10+context  363     85%  [81%, 88%]      2%        13%     0%      0%        6%      0.529
+top_10+context            363     85%  [81%, 88%]      0%        15%     0%      0%        4%      0.693
+A2 names+tail+lift        363     67%  [63%, 72%]     17%        16%     0%      1%        2%      0.575
+A3 names+tail+lift+mix    363     79%  [75%, 83%]      4%        17%     0%      1%        3%      0.591
+A5 names+tail+lift|chan   363     84%  [80%, 88%]      1%        15%     0%      0%        3%      0.572
+
+paired differences in world 2 (points, 95% interval):
+glossary added (top 10)           +3.3 [ +0.0,  +6.6]
+pin channel flags                +17.1 [+13.8, +21.2]
++ past fraud, counted per row    +11.3 [ +6.1, +16.5]
+rarity + rate vs percentile       -0.3 [ -3.3,  +2.8]
+LLM calls this session: 0 | replayed: 9601 | prompt drift: 0

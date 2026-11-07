@@ -1,5 +1,27 @@
 # Changelog
 
+## v6 (2026-11-06): better features, better context, 371 cases, a second world, plain words
+Benjy's requests: improve the features and AUROC, find out why percentiles seem to hurt, add richer "what larger/smaller means" context, use more cases and a larger variety, write for readers outside the domain (simple terms, domain knowledge shown through edge cases and what works), no "pre-registered" in the main text, bloated feature sets are fine. He approved more cases + a second world and a USD 7 cap (spent USD 5.38 in this round, USD 8.84 for the whole project).
+
+| # | Edit | Source | Status |
+|---|---|---|---|
+| 1 | Diagnosis before any change: percentiles-hurt was -2.0 points on 200 cases (noise), -4.3 [-7.5, -1.1] on 371. A tree on the 43 inputs alone names the pattern 97.6% of the time, so the narrator's evidence, not the features, is the bottleneck. | Benjy | done |
+| 2 | 19 new features (`code/10`), chosen on 4-fold CV over train + val rows (`code/11`); test scored once. PR-AUC 0.872 to 0.934, AUROC 0.9973 to 0.9991, events caught 371 to 390. Selection rule changed at Benjy's request to "best dev-CV PR-AUC, no size penalty" before the test split was scored (Amendment G2). | Benjy | done |
+| 3 | New evidence formats (`code/09`): rarity text, fraud rate, past fraud (per row; equal-weight). Cases: every caught event (371) instead of a 200 sample. Original 200 are a subset and reported as a sensitivity check in the repo. | Benjy | done |
+| 4 | Second simulated world (`code/13`, seed from SeedSequence(20261106)). | Benjy | done |
+| 5 | The article is rewritten for non-specialists: plain terms, a "mess I put in the data" section (edge cases the simulator contains), "what works / what didn't", "Where I was wrong" instead of a scorecard, no "pre-registered" in the main text. | Benjy | done |
+| 6 | The dormant-trap analysis (`code/16`): a note I wrote to fix the hero case misfires on 32 of 187 takeover and card-testing alerts. | Finding | done |
+| 7 | The v5 article, code and results are frozen in `v5/`. Repo-only v5 scripts (extra conditions, scorecard, figures 5-8) live only there. | Housekeeping | done |
+| 8 | Honest framing fixes: the glossary is +5.1 against the percentile version but +0.8 against plain names; rarity alone was not run in world 2; exploratory conditions (A8, A9) are labelled. | Self-review | done |
+
+Review round 1 (review v5, 79.6 weighted, NOT READY because of three over-claims in the intro) fixed: the over-claims, the jargon (15-item pass), disclosures about the simulator and the replication limits, block 9 and 10 clean-ups, figure labels. See REVISION_MEMO.md.
+
+Review round 2 (80.8 weighted, READY AFTER BLOCKERS) fixed: the untested lead sentence, the credit qualifier, simulator facts, stale publish pack; added the measured false-alarm-by-habit table and the dormant-note ablation. See REVISION_MEMO.md.
+
+Review round 3 (81.2 weighted; one citation cap) fixed: the mis-attributed [10], the stale "except three", four over-reaching phrases, ten more plain-language items. Score trajectory 79.6 -> 80.8 -> 81.2. See REVISION_MEMO.md.
+
+Numbers that changed from v5: all fraud-desk numbers (371 cases instead of 200: names 68%, names+pct 63%, glossary 68%, channel pinned 82%). Unchanged: Result 1 (143 matched alerts: 0% / 56% / 80% / 83%), AML, credit, claims and SOC.
+
 ## v4 (2026-10-18): simpler, complete code blocks
 
 Benjy's request: "simplify the code blocks a bit and in general simplify the experiments a bit so that the code is preferably complete and it tells the same story. Also the hero plot code should use real data that is discussed in this blog and should be fully reproducible if one follows the code blocks."

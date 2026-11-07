@@ -1,6 +1,7 @@
-# file: code/12_more_desks.py
+# file: code/15_more_desks.py
 # Repo only. Desk 4, two quick ones: insurance claims and security alerts.
 # Same recipe, new glossary: 8 features each, 3 planted typologies (specs in tsl.py).
+from tsl import *                                  # the repo scripts use the rest of tsl.py
 MINI = []
 for dname, segs, spec, typ, label in [
         ("claims", {"standard": .85, "high_value": .15}, CLAIMS_SPEC, CLAIMS_TYP, "insurance-claims fraud"),

@@ -1,0 +1,4 @@
+definitions changed: 2
+with the note     correct overall 82% | dormant-card cases correct 100% | takeover and card-testing alerts called 'dormant card': 32 of 187
+without the note  correct overall 89% | dormant-card cases correct 100% | takeover and card-testing alerts called 'dormant card': 13 of 187
+the 0.97 hero case, without the note, was called: dormant_reactivation

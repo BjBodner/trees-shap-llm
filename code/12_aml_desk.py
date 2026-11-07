@@ -1,4 +1,4 @@
-# file: code/09_aml_desk.py
+# file: code/12_aml_desk.py
 # Desk 2: AML. Monthly account summaries for 6 legit customer segments and 4 planted
 # laundering typologies (the spec is in tsl.py). Same recipe, new glossary.
 X_aml, lab_aml, seg_aml, split_aml = simulate_aml(SEEDS["aml"])

@@ -1,0 +1,5 @@
+takeover and card-testing alerts called 'dormant card': 32 of 187
+  ...that cite longest_gap_days_90d: 97% (the right answers cite it 2% of the time)
+  longest quiet spell in the last 90 days, median: 52 days (right answers: 6)
+  time since the purchase before this one, median: 1 hours (right answers: 1)
+my typology note for takeover ends with: If the card had been inactive for weeks before this, choose dormant_reactivation instead.
